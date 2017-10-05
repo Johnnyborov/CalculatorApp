@@ -47,9 +47,11 @@ namespace CalculatorLibraryTests
         // ends with wrong symbol
         [TestCase("2+4-")]
         [TestCase("2+2(")]
-        // bracket imbalance
+        // bracket imbalance of amount
         [TestCase("3+(2+2))")]
         [TestCase("(3+(2+2)")]
+        // bracket imbalance of order
+        [TestCase("2)*(3+2")]
         // invalid previous symbol before number
         [TestCase("2+(4)2")]
         // invalid previous symbol before operation

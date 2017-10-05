@@ -19,10 +19,38 @@ namespace CalculatorLibrary
             Regex regex = new Regex(pattern);
             expression = regex.Replace(expression, "");
 
-            // Validate the expression
+            // Validate allowed symbols
             pattern = @"^[\d|\.|\+|\-|\*|\/|\^|\(|\)]*$";
             regex = new Regex(pattern);
             if (expression.Length == 0 || !regex.IsMatch(expression))
+            {
+                throw new Exception("Not a valid expression");
+            }
+
+            // Validate allowed first symbol
+            pattern = @"^[\d|\-|\(]";
+            regex = new Regex(pattern);
+            if (!regex.IsMatch(expression))
+            {
+                throw new Exception("Not a valid expression");
+            }
+
+            // Validate allowed last symbol
+            pattern = @"[\d|\)]$";
+            regex = new Regex(pattern);
+            if (!regex.IsMatch(expression))
+            {
+                throw new Exception("Not a valid expression");
+            }
+
+            // Validate bracket amount balance
+            pattern = @"(\()";
+            regex = new Regex(pattern);
+            MatchCollection openingBrackets = regex.Matches(expression);
+            pattern = @"(\))";
+            regex = new Regex(pattern);
+            MatchCollection closingBrackets = regex.Matches(expression);
+            if (openingBrackets.Count != closingBrackets.Count)
             {
                 throw new Exception("Not a valid expression");
             }
@@ -79,9 +107,13 @@ namespace CalculatorLibrary
                                 stack.Push(tempResult);
                                 peekResult = helpStack.Peek();
                             }
-                            if ((peekResult as Bracket).BracketType == BracketTypes.Opening)
+                            if ((peekResult as Bracket)?.BracketType == BracketTypes.Opening)
                             {
                                 helpStack.Pop();
+                            }
+                            else
+                            {
+                                throw new Exception("Not a valid expression");  // Didnt find corresponding opening bracket
                             }
                         }
                         else
@@ -211,6 +243,8 @@ namespace CalculatorLibrary
                         StringLength = 1,
                         BracketType = BracketTypes.Closing
                     };
+                case '.':
+                    throw new Exception("Not a valid expression");  // dot can only be in a middle of a number
                 default:
                     string numberAsString = ReturnFirstNumber(expression);
 
@@ -228,7 +262,7 @@ namespace CalculatorLibrary
 
         private static string ReturnFirstNumber(string expression)
         {
-            string pattern = @"^(\d+)\.(\d+)|^(\d+)";
+            string pattern = @"^(\d+\.\d+|^\d+)";
             Regex regex = new Regex(pattern);
             Match match = regex.Match(expression);
             return match.Value;
