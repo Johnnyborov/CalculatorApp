@@ -13,11 +13,12 @@ namespace CalculatorLibraryTests
         [TestCase("4", "4")]
         [TestCase("3+4", "3 4 +")]
         [TestCase("2+3*4*5-9", "2 3 4 * 5 * + 9 -")]
-        // brackets
+        [TestCase("4%3*2", "4 3 % 2 *")]
+        // brackets and unary operations
         [TestCase("(3+4)", "3 4 +")]
-        [TestCase("-3+4", "0 3 - 4 +")]      
-        [TestCase("(-3+4)", "0 3 - 4 +")]
-        [TestCase("(3)+(-4)", "3 0 4 - +")]
+        [TestCase("-3+4", "3 - 4 +")]      
+        [TestCase("(-3+4)", "3 - 4 +")]
+        [TestCase("(3)+(-4)", "3 4 - +")]
         [TestCase("(2+3)*4*(5-9)^5", "2 3 + 4 * 5 9 - 5 ^ *")]
         // special power priority
         [TestCase("2+3^2^4", "2 3 2 4 ^ ^ +")]
@@ -25,6 +26,22 @@ namespace CalculatorLibraryTests
         [TestCase("324.02^0.5+345*44.55", "324.02 0.5 ^ 345 44.55 * +")]
         // spaces
         [TestCase("   2 +  3   * 4*  5- 9 ", "2 3 4 * 5 * + 9 -")]
+        // factorials
+        [TestCase("4!", "4 !")]
+        [TestCase("4-3!", "4 3 ! -")]
+        [TestCase("(4+3)!", "4 3 + !")]
+        [TestCase("4!*3", "4 ! 3 *")]
+        [TestCase("4!^2", "4 ! 2 ^")]
+        [TestCase("4!!", "4 ! !")]
+        [TestCase("4^2!", "4 2 ! ^")]
+        // functions
+        [TestCase("sin(4)", "4 sin")]
+        [TestCase("sIn(4)", "4 sin")]
+        [TestCase("cos(4+3*2)", "4 3 2 * + cos")]
+        [TestCase("cos(4)^2", "4 cos 2 ^")]
+        [TestCase("sin(cos(4))", "4 cos sin")]
+        [TestCase("sin((2))^(cos(1))", "2 sin 1 cos ^")]
+        [TestCase("sin(cos(2342.324)^2.2)*sin(0.001)", "2342.324 cos 2.2 ^ sin 0.001 sin *")]
         public void ParseExpression_CorrectInput_CorrectResultReturned(string input, string expected)
         {
             var stack = Parser.ParseExpression(input);
@@ -56,21 +73,31 @@ namespace CalculatorLibraryTests
         [TestCase("2+(4)2")]
         // invalid previous symbol before operation
         [TestCase("2++2")]
-        [TestCase("2)(+2")]
+        [TestCase("2*(/2)")]
         // invalid previous symbol before opening bracket
         [TestCase("2+2(4)")]
         [TestCase("2+(3)(4)")]
         // invalid previous symbol before closing bracket
         [TestCase("2+(2*)-(4)")]
         [TestCase("2+()-(4)")]
-        // invalid symbols
-        [TestCase("23=47")]
         // dots in the wrong place
         [TestCase(".2")]
         [TestCase("2.")]
         [TestCase("2..4")]
         [TestCase("24.+2")]
         [TestCase("24+.2")]
+        // factorials
+        [TestCase("!")]
+        [TestCase("2+(!2)")]
+        [TestCase("2!3")]
+        [TestCase("2!(4)")]
+        [TestCase("2(!)")]
+        [TestCase("2!(!)")]
+        // invalid symbols
+        [TestCase("23=47")]
+        // functions
+        [TestCase("sin2")]
+        [TestCase("sin(s)")]
         public void ParseExpression_InvalidInput_Throw(string input)
         {
             var ex = Assert.Catch<Exception>(() => Parser.ParseExpression(input));
