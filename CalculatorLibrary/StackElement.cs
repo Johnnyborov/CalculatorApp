@@ -12,17 +12,27 @@ namespace CalculatorLibrary
     internal enum OperationTypes
     {
         Plus,
+        PlusUnary,
         Minus,
+        MinusUnary,
         Multiply,
         Divide,
-        Power
+        Remainder,
+        Power,
+        Factorial,
+        Sin,
+        Cos
     }
 
     internal enum OperationPriorities
     {
         PlusMinus = 1,
+        PlusMinusUnary = 2,
         MultiplyDivide = 2,
-        Power = 3
+        Remainder = 2,
+        Power = 3,
+        Factorial = 4,
+        Function = 5
     }
 
     internal enum BracketTypes
@@ -72,6 +82,10 @@ namespace CalculatorLibrary
 
         internal OperationPriorities Priority { get; set; }
 
+        internal bool IsUnary { get; set; } = false;
+
+        internal bool IsFunction { get; set; } = false;
+
         public override string ToString()
         {
             switch (Op)
@@ -80,12 +94,24 @@ namespace CalculatorLibrary
                     return "+";
                 case OperationTypes.Minus:
                     return "-";
+                case OperationTypes.PlusUnary:
+                    return "+";
+                case OperationTypes.MinusUnary:
+                    return "-";
                 case OperationTypes.Multiply:
                     return "*";
                 case OperationTypes.Divide:
                     return "/";
+                case OperationTypes.Remainder:
+                    return "%";
                 case OperationTypes.Power:
                     return "^";
+                case OperationTypes.Factorial:
+                    return "!";
+                case OperationTypes.Sin:
+                    return "sin";
+                case OperationTypes.Cos:
+                    return "cos";
                 default:
                     return "OperationValueNotSet";
             }
